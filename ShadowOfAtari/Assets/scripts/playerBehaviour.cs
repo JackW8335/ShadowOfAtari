@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
- enum playerState { idle,falling,Grounded, climbing, overhangClimbing };
+ enum playerState { idle,falling,Grounded, climbing, overhangClimbing,dead };
 
 public class playerBehaviour : MonoBehaviour
 {
     public float walkingSpeed, climbingSpeed;
     public string DebugState;
+    public bool FacingRight;
 
 
     playerState state;
     private Rigidbody2D Rbody;
+    private SpriteRenderer sprite;
     public float Grip;
     int Lives;
-    bool alive;
 
 
     // Use this for initialization
@@ -23,91 +24,125 @@ public class playerBehaviour : MonoBehaviour
         walkingSpeed = 3.0f;
         climbingSpeed = 2.0f;
            
-        alive = true;
         Lives = 3;
         Grip = 100f;
+        FacingRight = true;
 
         state = playerState.idle;//change to enum
         DebugState = "idle";
         Rbody = this.GetComponent<Rigidbody2D>();
-
+        sprite = this.GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (alive)
+
+        switch (state)
         {
-            switch (state)
-            {
-                case playerState.Grounded:
+            case playerState.Grounded:
+                {
+                    setNewSprite("walkingSprite");
+                    Walking();
+                    DebugState = "ground";
+                    RecoverGrip(0.2f);
+                    break;
+                }
+            case playerState.climbing:
+                {
+                    //setNewSprite("climbingSprite");
+                    if (playerHasGrip())
                     {
-                        Walking();
-                        DebugState = "ground";
-                        RecoverGrip(0.2f);
-
-                        break;
+                        DebugState = "climbing";
+                        Climbing();
+                        DecreaseStaminaOverTime(0.2f);
                     }
-                case playerState.climbing:
+                    else
                     {
-                        if (playerHasGrip())
-                        {
-                            DebugState = "climbing";
-                            Climbing();
-                            DecreaseStaminaOverTime(0.2f);
-                        }
-                        else
-                        {
-                            state = playerState.falling;
-                        }
-                        break;
+                        state = playerState.falling;
                     }
-                case playerState.overhangClimbing:
+                    break;
+                }
+            case playerState.overhangClimbing: //differnt sprite animations 
+                {
+                    if (playerHasGrip())
                     {
-                        if (playerHasGrip())
-                        {
-                            DebugState = "climbing";
-                            Climbing();
-                            DecreaseStaminaOverTime(0.4f);// more arm stress
-                        }
-                        else
-                        {
-                            state = playerState.falling;
-                        }
-                        break;
+                        DebugState = "climbing";
+                        Climbing();
+                        DecreaseStaminaOverTime(0.2f);// more arm stress
                     }
-                case playerState.falling:
+                    else
                     {
-                        DebugState = "falling";
-                        Rbody.gravityScale = 1;
-                        RecoverGrip(0.2f);
-                        break;
+                        state = playerState.falling;
                     }
-                // add faling movement same as wallking but no annimation
-                default:
-                    {
-                        RecoverGrip(0.2f);
-                        break;
-                    }
-            }
+                    break;
+                }
+            case playerState.falling:
+                {
+                    setNewSprite("walkingSprite");
+                    DebugState = "falling";
+                    Rbody.gravityScale = 1;
+                    RecoverGrip(0.2f);
+                    break;
+                }
+            case playerState.dead:
+                {
+                    //minus one from lives
+                    Lives --;
+                    //calls scene manger to :
+                    // resets scene
+                    //resets timer 
+                    /*pass scene manger copy of players current state to reintate class
+                    and to check if the player is put of lives */ 
+                    break;
+                }
+            // add faling movement same as wallking but no annimation
+            default:
+                {
+                    setNewSprite("walkingSprite");
+                    RecoverGrip(0.2f);
+                    break;
+                }
         }
+    }
 
+    void setNewSprite(string spriteName)
+    {
+        if (sprite.sprite.name != spriteName)
+        {
+            sprite.sprite = Resources.Load(spriteName, typeof(Sprite)) as Sprite;
+        }
     }
 
     void Walking()
     {
         Rbody.gravityScale = 1;
-        Vector3 walk = new Vector3(Input.GetAxis("Horizontal"), 0, 0);
+        float h = Input.GetAxis("Horizontal");
+        Vector3 walk = new Vector3(h, 0, 0);
         this.transform.position += walk * walkingSpeed * Time.deltaTime;
+        if (h > 0 && !FacingRight)
+        {
+            Flip();
+        }
+        else if (h < 0 && FacingRight)
+        {
+            Flip();
+        }
+    }
+
+    void Flip()
+    {
+        FacingRight = !FacingRight;
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
     }
 
     void Climbing()
     {
         Rbody.gravityScale = 0;
         Vector3 climb = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
-        this.transform.position += climb * climbingSpeed * Time.deltaTime;
-
-       
+        this.transform.position += climb * climbingSpeed * Time.deltaTime; 
     }
 
     void DecreaseStaminaOverTime(float gripLossRate)
@@ -122,7 +157,6 @@ public class playerBehaviour : MonoBehaviour
             Grip += recoverRate * Time.deltaTime;
         }
     }
-
 
     bool playerHasGrip()
     {
