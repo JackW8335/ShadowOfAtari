@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
- enum playerState { idle,falling,Grounded, climbing, overhangClimbing,dead };
+enum playerState { idle, falling, Grounded, climbing, overhangClimbing, dead };
 
 public class playerBehaviour : MonoBehaviour
 {
-    public float walkingSpeed, climbingSpeed,fallForce;
+    public float walkingSpeed, climbingSpeed, fallForce;
     public string DebugState;
     public bool FacingRight;
-
+    public bool climbing = false;
 
     playerState state;
     private Rigidbody2D Rbody;
@@ -24,7 +24,7 @@ public class playerBehaviour : MonoBehaviour
         walkingSpeed = 3.0f;
         climbingSpeed = 2.0f;
         fallForce = 0.5f;
-           
+
         Lives = 3;
         Grip = 100f;
         FacingRight = true;
@@ -56,21 +56,7 @@ public class playerBehaviour : MonoBehaviour
                     {
                         DebugState = "climbing";
                         Climbing();
-                        DecreaseStaminaOverTime(0.2f);
-                    }
-                    else
-                    {
-                        state = playerState.falling;
-                    }
-                    break;
-                }
-            case playerState.overhangClimbing: //differnt sprite animations 
-                {
-                    if (playerHasGrip())
-                    {
-                        DebugState = "climbing";
-                        Climbing();
-                        DecreaseStaminaOverTime(0.2f);// more arm stress
+                        DecreaseGripOverTime(0.2f);
                     }
                     else
                     {
@@ -84,17 +70,18 @@ public class playerBehaviour : MonoBehaviour
                     DebugState = "falling";
                     Falling();
                     RecoverGrip(0.2f);
+                    climbing = false;
                     break;
                 }
             case playerState.dead:
                 {
                     //minus one from lives
-                    Lives --;
+                    Lives--;
                     //calls scene manger to :
                     // resets scene
                     //resets timer 
                     /*pass scene manger copy of players current state to reintate class
-                    and to check if the player is put of lives */ 
+                    and to check if the player is put of lives */
                     break;
                 }
             // add faling movement same as wallking but no annimation
@@ -118,9 +105,12 @@ public class playerBehaviour : MonoBehaviour
     void Walking()
     {
         Rbody.gravityScale = 1;
+
+        Vector3 walk = Vector3.zero;
         float h = Input.GetAxis("Horizontal");
-        Vector3 walk = new Vector3(h, 0, 0);
+        walk = new Vector3(h, 0, 0);
         this.transform.position += walk * walkingSpeed * Time.deltaTime;
+
         if (h > 0 && !FacingRight)
         {
             Flip();
@@ -142,9 +132,23 @@ public class playerBehaviour : MonoBehaviour
     void Climbing()
     {
         Rbody.gravityScale = 0;
-        Vector3 climb = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
-        this.transform.position += climb * climbingSpeed * Time.deltaTime; 
+        climbing = true;
+        Vector3 climb = Vector3.zero;
+        climb = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
+        this.transform.position += climb * climbingSpeed * Time.deltaTime;
     }
+
+    void attackWeakSpot()
+    {
+        //get object refrence
+        // deal damage 
+        // tell boss to trun off weak spot effect 
+
+        //get monstor element
+        // minus damge from monstors health 
+        // set health(get health - player attack)
+    }
+
 
     void Falling()
     {
@@ -163,7 +167,7 @@ public class playerBehaviour : MonoBehaviour
         }
     }
 
-    void DecreaseStaminaOverTime(float gripLossRate)
+    void DecreaseGripOverTime(float gripLossRate)
     {
         Grip -= gripLossRate * Time.deltaTime;
     }
@@ -185,57 +189,80 @@ public class playerBehaviour : MonoBehaviour
         return true;
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "ground")
+        {
+            state = playerState.Grounded;
+        }
+    }
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.tag == "monstor")
+        if (other.tag == "weakSpot")
+        {
+            if (Input.GetButton("Fire2"))
+            {
+                attackWeakSpot();
+            }
+
+        }
+        else if (other.tag == "monstor")
         {
             //if player action button
             if (playerHasGrip())
             {
-                if (Input.GetKey(KeyCode.Z)) // need to change for controller
+                if (Input.GetButton("Fire1")) // Input.GetKey(KeyCode.Z)
                 {
 
-                    state = playerState.climbing;
+                    //if (climbing)
+                    //{
+                    //    state = playerState.falling;
+                       
+                    //}
+                    //else if(state == playerState.climbing)
+                    //{
+                    //    state = playerState.falling;
+                    //}
+                    //else if(state == playerState.Grounded)
+                    //{
+                    //    state = playerState.climbing;
+                    //}
+
+                    switch (climbing)
+                    {
+                        case true:
+                            state = playerState.falling;
+                            
+                            break;
+
+                        case false:
+                 
+                            state = playerState.climbing;
+                            
+                            break;
+
+                        default:
+                            break;
+                    }
                     //if bottom of player is not colliding with monstor then 
                     /*{
                         action = playerState.overhangclimbing
                     }*/
+
                 }
+
             }
-            else
-            {
-                state = playerState.falling;
-            }
-        }
-        else if (other.tag == "ground")
-        {
-            state = playerState.Grounded;
-        }
-        else
-        {
-            state = playerState.falling;
+
         }
 
-       /* switch (other.tag)
-        {
-            case "ground":
-                state = playerState.Grounded;
-                break;
-            case "monstor":
-                {
-                   
-                    break;
-                }
-            default:
-                {
-                   // state = playerState.falling;
-                    break;
-                }
-        }*/
+        //else
+        //{
+        //    state = playerState.falling;
+        //}
     }
     private void OnTriggerExit2D(Collider2D other)
     {
-        if(other.tag == "monstor")
-        state = playerState.falling;
+        //if (other.tag == "monstor")
+        //    state = playerState.falling;
     }
 }
