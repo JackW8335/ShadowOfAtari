@@ -211,23 +211,8 @@ public class playerBehaviour : MonoBehaviour
             //if player action button
             if (playerHasGrip())
             {
-                if (Input.GetButton("Fire1")) // Input.GetKey(KeyCode.Z)
-                {
-
-                    //if (climbing)
-                    //{
-                    //    state = playerState.falling;
-                       
-                    //}
-                    //else if(state == playerState.climbing)
-                    //{
-                    //    state = playerState.falling;
-                    //}
-                    //else if(state == playerState.Grounded)
-                    //{
-                    //    state = playerState.climbing;
-                    //}
-
+                if (Input.GetButton("Fire1"))
+                { 
                     switch (climbing)
                     {
                         case true:
@@ -244,21 +229,11 @@ public class playerBehaviour : MonoBehaviour
                         default:
                             break;
                     }
-                    //if bottom of player is not colliding with monstor then 
-                    /*{
-                        action = playerState.overhangclimbing
-                    }*/
-
                 }
 
             }
 
         }
-
-        //else
-        //{
-        //    state = playerState.falling;
-        //}
     }
     private void OnTriggerExit2D(Collider2D other)
     {
