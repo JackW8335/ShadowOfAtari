@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 enum playerState { idle, falling, Grounded, climbing, overhangClimbing, dead };
 
@@ -10,6 +11,13 @@ public class playerBehaviour : MonoBehaviour
     public string DebugState;
     public bool FacingRight;
     public bool climbing = false;
+
+    public int max_health;
+    public int health;
+
+
+    public Slider health_bar;
+    public Slider grip_bar;
 
     playerState state;
     private Rigidbody2D Rbody;
@@ -21,6 +29,7 @@ public class playerBehaviour : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        
         walkingSpeed = 3.0f;
         climbingSpeed = 2.0f;
         fallForce = 0.5f;
@@ -33,13 +42,26 @@ public class playerBehaviour : MonoBehaviour
         DebugState = "idle";
         Rbody = this.GetComponent<Rigidbody2D>();
         sprite = this.GetComponent<SpriteRenderer>();
+
+        health_bar.value = max_health;
+        
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+
+            //DealDamage(10);
+            //stamina -= 50;
+            health_bar.value = health -= 10;
+            
+        }
         DebugState = "climbing";
         Climbing();
+        DecreaseGripOverTime(10.0f);
+        grip_bar.value = Grip;
         /* switch (state)
          {
              case playerState.Grounded:
