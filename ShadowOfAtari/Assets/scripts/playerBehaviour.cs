@@ -10,11 +10,16 @@ public class playerBehaviour : MonoBehaviour
     public string DebugState;
     public bool FacingRight;
     public bool climbing;
+    public bool canAttack;
+
+    public string weakSpotName;
+    
 
     playerState state;
     private Rigidbody2D Rbody;
     //private SpriteRenderer sprite;
     public float Grip;
+    public int damage;
 
 
     // Use this for initialization
@@ -26,9 +31,14 @@ public class playerBehaviour : MonoBehaviour
         fallForce = 0.5f;
 
         climbingSpeed = 2.0f;
-        climbing = false;
         Grip = 100f;
-       
+        damage = 10;
+        climbing = false;
+        canAttack = false;
+
+        weakSpotName = "";
+
+
         state = playerState.idle;//change to enum
         DebugState = "idle";
 
@@ -60,6 +70,13 @@ public class playerBehaviour : MonoBehaviour
                     if (playerHasGrip())
                     {
                         Climbing();
+                        if(canAttack)
+                        {
+                            if (Input.GetButton("Fire2"))
+                            {
+                                attackWeakSpot();
+                            }
+                        }
                         DecreaseGripOverTime(0.2f);
                     }
                     else
@@ -135,6 +152,13 @@ public class playerBehaviour : MonoBehaviour
         //get monstor element
         // minus damge from monstors health 
         // set health(get health - player attack)
+        GameObject bossObject = GameObject.Find("Boss");
+        BossBehaviourScript boss = bossObject.GetComponent<BossBehaviourScript>();
+        boss.setHeath(boss.getHeath() - damage);
+        boss.turnOffWeakSpot(weakSpotName);
+
+        canAttack = false;
+
     }
 
 
@@ -184,17 +208,18 @@ public class playerBehaviour : MonoBehaviour
         {
             state = playerState.grounded;
         }
+
+        if (other.tag == "weakSpot")
+        {
+
+            canAttack = true;
+            weakSpotName = other.name;
+        }
     }
     private void OnTriggerStay2D(Collider2D other)
     {
-        //if (other.tag == "weakSpot")
-        //{
-        //    if (Input.GetButton("Fire2"))
-        //    {
-        //        attackWeakSpot();
-        //    }
+        
 
-        //}
         //else 
         if (other.tag == "monstor")
         {
