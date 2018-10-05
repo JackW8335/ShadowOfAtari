@@ -11,12 +11,18 @@ public class playerBehaviour : MonoBehaviour
     public bool FacingRight;
     public bool climbing = false;
 
+    public bool canClimb = false;
+    private int collisionCount = 0;
+
     playerState state;
     private Rigidbody2D Rbody;
     private SpriteRenderer sprite;
     public float Grip;
     int Lives;
 
+    public float fireDelta = 0.3F;
+    private float time = 0.0F;
+    private float nextFire = 0.3F;
 
     // Use this for initialization
     void Start()
@@ -35,10 +41,47 @@ public class playerBehaviour : MonoBehaviour
         sprite = this.GetComponent<SpriteRenderer>();
     }
 
+    private void Update()
+    {
+       time = time + Time.deltaTime;
+
+        //if player action button
+        if (canClimb)
+        {
+            if (Input.GetButton("Fire1") && time > nextFire)
+            {
+                nextFire = time + fireDelta;
+                if (playerHasGrip())
+                {
+                    switch (climbing)
+                    {
+                        case true:
+                            state = playerState.falling;
+
+                            Debug.Log("Falling state");
+                            break;
+
+                        case false:
+
+                            state = playerState.climbing;
+
+                            Debug.Log("climbingState");
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                nextFire = nextFire - time;
+                time = 0.0F;
+            }
+        }
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
-
+        
         switch (state)
         {
             case playerState.Grounded:
@@ -54,6 +97,7 @@ public class playerBehaviour : MonoBehaviour
                     //setNewSprite("climbingSprite");
                     if (playerHasGrip())
                     {
+                        climbing = true;
                         DebugState = "climbing";
                         Climbing();
                         DecreaseGripOverTime(0.2f);
@@ -61,6 +105,7 @@ public class playerBehaviour : MonoBehaviour
                     else
                     {
                         state = playerState.falling;
+                        climbing = false;
                     }
                     break;
                 }
@@ -132,10 +177,22 @@ public class playerBehaviour : MonoBehaviour
     void Climbing()
     {
         Rbody.gravityScale = 0;
-        climbing = true;
+        Rbody.velocity = new Vector2(0,0);
+     
         Vector3 climb = Vector3.zero;
         climb = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
         this.transform.position += climb * climbingSpeed * Time.deltaTime;
+
+        float h = Input.GetAxis("Horizontal");
+        if (h > 0 && !FacingRight)
+        {
+            Flip();
+        }
+        else if (h < 0 && FacingRight)
+        {
+            Flip();
+        }
+
     }
 
     void attackWeakSpot()
@@ -195,49 +252,54 @@ public class playerBehaviour : MonoBehaviour
         {
             state = playerState.Grounded;
         }
+        if(other.tag == "monstor")
+        {
+            collisionCount++;
+        }
+       
     }
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.tag == "weakSpot")
+        if (Input.GetButton("Fire2")) 
         {
-            if (Input.GetButton("Fire2"))
+            if (other.tag == "weakSpot")
             {
                 attackWeakSpot();
             }
 
         }
-        else if (other.tag == "monstor")
+        if (other.tag == "monstor")
         {
-            //if player action button
-            if (playerHasGrip())
-            {
-                if (Input.GetButton("Fire1"))
-                { 
-                    switch (climbing)
-                    {
-                        case true:
-                            state = playerState.falling;
-                            
-                            break;
-
-                        case false:
-                 
-                            state = playerState.climbing;
-                            
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-
-            }
-
+            canClimb = true;
+          
         }
+        if(other.tag == "ground")
+        {
+            if(!climbing)
+            {
+                state = playerState.Grounded;
+            }
+        }
+        //else
+        //{
+        //    canClimb = false;
+        //}
     }
     private void OnTriggerExit2D(Collider2D other)
     {
-        //if (other.tag == "monstor")
-        //    state = playerState.falling;
+        if (other.tag == "monstor")
+        {
+            collisionCount--;
+        }
+        if (collisionCount== 0)
+        {
+                canClimb = false;
+ 
+        }
+        if (other.tag == "monstor" && !canClimb)
+        {
+            state = playerState.falling;
+        }
+
     }
 }
