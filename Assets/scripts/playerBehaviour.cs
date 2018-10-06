@@ -87,7 +87,7 @@ public class playerBehaviour : MonoBehaviour
         {
             case playerState.Grounded:
                 {
-                    setNewSprite("walkingSprite");
+                    setNewSprite("walking1");
                     Walking();
                     DebugState = "ground";
                     RecoverGrip(0.2f);
@@ -125,7 +125,7 @@ public class playerBehaviour : MonoBehaviour
                 }
             case playerState.falling:
                 {
-                    setNewSprite("walkingSprite");
+                    setNewSprite("walking1");
                     DebugState = "falling";
                     Falling();
                     RecoverGrip(0.2f);
@@ -146,7 +146,7 @@ public class playerBehaviour : MonoBehaviour
             // add faling movement same as wallking but no annimation
             default:
                 {
-                    setNewSprite("walkingSprite");
+                    setNewSprite("walking1");
                     RecoverGrip(0.2f);
                     break;
                 }
