@@ -8,18 +8,14 @@ public class cameraChangeScript : MonoBehaviour {
     public Camera newCamera;
     private Camera oldCameraSave;
     private Camera newCameraSave;
-    private int xPos;
-    private int yPos;
-    private Transform player;
+    public GameObject player;
+    private bool enterFromLeft;
+    private bool enterFromAbove;
 
     private void Start()
     {
         newCamera.enabled = false;  //disable all but start camera at beginning
-    }
-
-    private void Update()
-    {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        enterFromLeft = false;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -31,6 +27,9 @@ public class cameraChangeScript : MonoBehaviour {
             newCamera.enabled = true;   //disable old camera and enable new
             oldCamera.enabled = false;
         }
+
+        positionBasedOnCamera(other);
+        //Debug.Log(enterFromLeft + " " + this.gameObject.name.ToString());
     }
     void OnTriggerExit2D(Collider2D other)
     {
@@ -43,39 +42,81 @@ public class cameraChangeScript : MonoBehaviour {
         }
     }
 
-    void changePosition()
+    //checks the current trigger name and moves player based on trigger location
+    void positionBasedOnCamera(Collider2D other)
     {
-        if (xPos != 0)
+        switch (this.gameObject.name.ToString())
         {
-            player.position = new Vector2(xPos, player.position.y);
-        }
-        if (yPos != 0)
-        {
-            player.position = new Vector2(player.position.x, yPos);
+            case "First_Camera_Trigger":
+                {
+                    directionEnter(other);
+                    if (enterFromLeft)
+                    {
+                        player.transform.position = new Vector3(this.gameObject.transform.position.x, player.transform.position.y);
+                        player.transform.position += new Vector3(1, 0);
+                    }
+                    else
+                    {
+                        player.transform.position = new Vector3(this.gameObject.transform.position.x, player.transform.position.y);
+                        player.transform.position += new Vector3(-1, 0);
+                    }
+                    break;
+                }
+            case "Second_Camera_Trigger":
+                {
+                    directionEnter(other);
+                    if (enterFromAbove)
+                    {
+                        player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
+                        player.transform.position += new Vector3(0, -1);
+                    }
+                    else
+                    {
+                        player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
+                        player.transform.position += new Vector3(0, 1);
+                    }
+                    break;
+                }
+            case "Third_Camera_Trigger":
+                {
+                    directionEnter(other);
+                    if (enterFromAbove)
+                    {
+                        player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
+                        player.transform.position += new Vector3(0, -1);
+                    }
+                    else
+                    {
+                        player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
+                        player.transform.position += new Vector3(0, 1);
+                    }
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
         }
     }
 
-    void positionBasedOnCamera()
+    void directionEnter(Collider2D other)
     {
-        switch (oldCameraSave.name.ToString())
+        if (other.transform.position.x < this.transform.position.x)
         {
-            case ("Start_Camera"):
-                {
-                    xPos = -20;
-                    break;
-                }
-            case ("Camera_1"):
-                {
-                    break;
-                }
-            case ("Camera_2"):
-                {
-                    break;
-                }
-            case ("Camera_3"):
-                {
-                    break;
-                }
+            enterFromLeft = true;
+        }
+        else if (other.transform.position.x > this.transform.position.x)
+        {
+            enterFromLeft = false;
+        }
+
+        if (other.transform.position.y < this.transform.position.y)
+        {
+            enterFromAbove = false;
+        }
+        else if (other.transform.position.y > this.transform.position.y)
+        {
+            enterFromAbove = true;
         }
     }
 }
