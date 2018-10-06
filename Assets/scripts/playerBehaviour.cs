@@ -6,6 +6,7 @@ enum playerState { idle, falling, Grounded, climbing, overhangClimbing, dead };
 
 public class playerBehaviour : MonoBehaviour
 {
+    public BossBehaviour boss;
     public float walkingSpeed, climbingSpeed, fallForce;
     public string DebugState;
     public bool FacingRight;
@@ -94,13 +95,26 @@ public class playerBehaviour : MonoBehaviour
                 }
             case playerState.climbing:
                 {
+                    
+                    //if boss is shaking then grip will drain faster.
+                    if (boss.state == BossBehaviour.boss_states.SHAKING)
+                    {
+                        if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+                        {
+                            
+                            DebugState = "climbing";
+                            Climbing();
+                            DecreaseGripOverTime(10.0f);
+                        }
+                    }
                     //setNewSprite("climbingSprite");
-                    if (playerHasGrip())
+                    else if (playerHasGrip())
                     {
                         climbing = true;
                         DebugState = "climbing";
                         Climbing();
                         DecreaseGripOverTime(0.2f);
+
                     }
                     else
                     {
