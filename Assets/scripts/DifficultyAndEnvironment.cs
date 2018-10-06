@@ -25,6 +25,12 @@ public class DifficultyAndEnvironment : MonoBehaviour
     {
         changeDifficulty();
 
+        if (boss.state == BossBehaviour.boss_states.SHAKING)
+        {
+            shaking(1.0f, 0.4f);
+        }
+
+
     }
 
     void changeDifficulty()
@@ -46,5 +52,20 @@ public class DifficultyAndEnvironment : MonoBehaviour
             }
 
         }
+
+
+    }
+
+    void shaking(float duration, float magnitude)
+    {
+
+        Vector3 originalPos = transform.localPosition;
+
+            float x = Random.Range(-1.0f, 1.0f) * magnitude;
+            float y = Random.Range(-1.0f, 1.0f) * magnitude;
+
+            transform.localPosition = new Vector3(x, y, originalPos.z);
+        
     }
 }
+
