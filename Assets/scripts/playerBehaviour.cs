@@ -6,6 +6,7 @@ enum playerState { idle, falling, Grounded, climbing, overhangClimbing, dead };
 
 public class playerBehaviour : MonoBehaviour
 {
+    Animator anim;
     public BossBehaviour boss;
     public float walkingSpeed, climbingSpeed, fallForce;
     public string DebugState;
@@ -28,7 +29,7 @@ public class playerBehaviour : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        walkingSpeed = 3.0f;
+        walkingSpeed = 100.0f;
         climbingSpeed = 2.0f;
         fallForce = 0.5f;
 
@@ -40,6 +41,7 @@ public class playerBehaviour : MonoBehaviour
         DebugState = "idle";
         Rbody = this.GetComponent<Rigidbody2D>();
         sprite = this.GetComponent<SpriteRenderer>();
+        anim = this.GetComponent<Animator>();
     }
 
     private void Update()
@@ -87,7 +89,7 @@ public class playerBehaviour : MonoBehaviour
         {
             case playerState.Grounded:
                 {
-                    setNewSprite("walking1");
+                    setNewSprite("walking");
                     Walking();
                     DebugState = "ground";
                     RecoverGrip(0.2f);
@@ -111,6 +113,7 @@ public class playerBehaviour : MonoBehaviour
                     else if (playerHasGrip())
                     {
                         climbing = true;
+
                         DebugState = "climbing";
                         Climbing();
                         DecreaseGripOverTime(0.2f);
@@ -163,6 +166,7 @@ public class playerBehaviour : MonoBehaviour
 
     void Walking()
     {
+        anim.Play("Walking_anim");
         Rbody.gravityScale = 1;
 
         Vector3 walk = Vector3.zero;
@@ -190,6 +194,7 @@ public class playerBehaviour : MonoBehaviour
 
     void Climbing()
     {
+        anim.Play("Climbing_anim");
         Rbody.gravityScale = 0;
         Rbody.velocity = new Vector2(0,0);
      
