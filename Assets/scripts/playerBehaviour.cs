@@ -29,6 +29,7 @@ public class playerBehaviour : MonoBehaviour
     public BossBehaviour boss;
     private Rigidbody2D Rbody;
     private SpriteRenderer sprite;
+    private Animator anim;
     public float Grip;
     public float damage;
     public bool canAttack;
@@ -64,7 +65,7 @@ public class playerBehaviour : MonoBehaviour
         DebugState = "idle";
         Rbody = this.GetComponent<Rigidbody2D>();
         sprite = this.GetComponent<SpriteRenderer>();
-
+        anim = GetComponent<Animator>();
     }
 
     private void Update()
@@ -179,6 +180,7 @@ public class playerBehaviour : MonoBehaviour
             case playerState.falling:
                 {
                     // setNewSprite("walking1");
+                    anim.SetBool("Climbing", false);
                     DebugState = "falling";
                     Falling();
                     RecoverGrip(IncreaseRate);
@@ -213,7 +215,7 @@ public class playerBehaviour : MonoBehaviour
     void Walking()
     {
         Rbody.gravityScale = 1;
-
+        anim.SetBool("Climbing", false);
         Vector3 walk = Vector3.zero;
         float h = Input.GetAxis("Horizontal");
         walk = new Vector3(h, 0, 0);
@@ -227,6 +229,16 @@ public class playerBehaviour : MonoBehaviour
         {
             Flip();
         }
+
+        if (h != 0)
+        {
+            anim.SetBool("Walking", true);
+        }
+        else
+        {
+            anim.SetBool("Walking", false);
+        }
+        
     }
 
     void Flip()
@@ -240,6 +252,7 @@ public class playerBehaviour : MonoBehaviour
     void Climbing()
     {
         Rbody.gravityScale = 0;
+        anim.SetBool("Walking", false);
         Rbody.velocity = new Vector2(0, 0);
 
         Vector3 climb = Vector3.zero;
@@ -247,14 +260,20 @@ public class playerBehaviour : MonoBehaviour
         this.transform.position += climb * climbingSpeed * Time.deltaTime;
 
         float h = Input.GetAxis("Horizontal");
-        if (h > 0 && !FacingRight)
-        {
-            Flip();
+        float v = Input.GetAxis("Vertical");
+
+        if (state == playerState.climbing)
+       {
+            if ((h != 0) || (v != 0))
+            {
+                anim.SetBool("Climbing", true);
+            }
+            else
+            {
+                anim.SetBool("Climbing", true);
+            }
         }
-        else if (h < 0 && FacingRight)
-        {
-            Flip();
-        }
+        
 
     }
 
