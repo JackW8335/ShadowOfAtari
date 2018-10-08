@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class BossBehaviour : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class BossBehaviour : MonoBehaviour
     private float rand;
 
     public Slider health_bar;
-    public enum boss_states { SHAKING, NORMAL };
+    public enum boss_states { SHAKING, NORMAL, DEAD };
 
     public boss_states state;
 
@@ -31,16 +32,14 @@ public class BossBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        time += Time.deltaTime;
-        if (Input.GetKeyDown(KeyCode.X))
+        if(health <= 0.0f)
         {
-
-            //DealDamage(10);
-            //stamina -= 50;
-            health_bar.value = health -= 10;
-
+            state = boss_states.DEAD;
+            SceneManager.LoadScene("Victory");
+              
         }
-
+        time += Time.deltaTime;
+        
         if (time >= rand)
         {
             
@@ -56,10 +55,20 @@ public class BossBehaviour : MonoBehaviour
 
 
     }
-
-    void WeakSpotHit()// need ref to game object 
+    public float getHeath()
     {
-        // deavtivate weak spot / turn of weak spot effect 
+        return health;
     }
 
+    public void setHeath(float nwHealth)
+    {
+        health = nwHealth;
+        health_bar.value = health;
+    }
+
+    public void turnOffWeakSpot(string weakspotName)
+    {
+        GameObject weakSpot = GameObject.Find(weakspotName);
+        weakSpot.SetActive(false);
+    }
 }

@@ -3,29 +3,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 enum playerState { idle, falling, Grounded, climbing, overhangClimbing, dead };
 
 public class playerBehaviour : MonoBehaviour
 {
-    public BossBehaviour boss;
     public float walkingSpeed, climbingSpeed, fallForce;
     public string DebugState;
     public bool FacingRight;
     public bool climbing = false;
     public int health;
 
+    public float DecreaseRate;
+    public float IncreaseRate;
+
     public Slider health_bar;
     public Slider grip_bar;
 
     public bool canClimb = false;
+    private bool gripAllow = true;
     private int collisionCount = 0;
 
     playerState state;
+    public BossBehaviour boss;
     private Rigidbody2D Rbody;
     private SpriteRenderer sprite;
     public float Grip;
-    int Lives;
+    public float damage;
+    public bool canAttack;
+    private string weakSpotName;
+
 
     public float fireDelta = 0.3F;
     private float time = 0.0F;
@@ -43,7 +51,12 @@ public class playerBehaviour : MonoBehaviour
         climbingSpeed = 2.0f;
         fallForce = 0.5f;
 
-        Lives = 3;
+        damage = 35;
+        canAttack = false;
+
+        weakSpotName = "";
+
+
         Grip = 100f;
         FacingRight = true;
 
@@ -51,8 +64,6 @@ public class playerBehaviour : MonoBehaviour
         DebugState = "idle";
         Rbody = this.GetComponent<Rigidbody2D>();
         sprite = this.GetComponent<SpriteRenderer>();
-
-
 
     }
 
@@ -63,8 +74,13 @@ public class playerBehaviour : MonoBehaviour
         health_bar.value = health;
         grip_bar.value = Grip;
 
+        if (health <= 0.0f)
+        {
+            state = playerState.dead;
+        }
+
         //if player action button
-        if (canClimb)
+        if (canClimb/* && Grip >= 25*/)
         {
             if (Input.GetButton("Fire1") && time > nextFire)
             {
@@ -100,6 +116,8 @@ public class playerBehaviour : MonoBehaviour
     {
         if (Grip <= 0)
         {
+            //canClimb    = false;
+           
             return false;
         }
         return true;
@@ -116,30 +134,39 @@ public class playerBehaviour : MonoBehaviour
                     //setNewSprite("walking1");
                     Walking();
                     DebugState = "ground";
-                    RecoverGrip(0.2f);
+                    RecoverGrip(IncreaseRate);
                     break;
                 }
             case playerState.climbing:
                 {
                     //if boss is shaking then grip will drain faster.
-                    if (boss.state == BossBehaviour.boss_states.SHAKING)
+
+                    if (playerHasGrip())
                     {
-                        if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+                        if (boss.state == BossBehaviour.boss_states.SHAKING)
                         {
-
-                            DebugState = "climbing";
-                            Climbing();
-                            DecreaseGripOverTime(10.0f);
+                            if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+                            {
+                                DecreaseGripOverTime(10.0f);
+                            }
+                            //setNewSprite("climbing1");
                         }
-                        //setNewSprite("climbing1");
-                    }
-
-                    else if (playerHasGrip())
-                    {
+                        else
+                        {
+                            {
+                                DecreaseGripOverTime(DecreaseRate);
+                            }
+                        }
                         climbing = true;
                         DebugState = "climbing";
+
+                        if (canAttack && Input.GetButton("Fire2"))
+                        {
+                            attackWeakSpot();
+                        }
+
                         Climbing();
-                        DecreaseGripOverTime(0.2f);
+
 
                     }
                     else
@@ -154,26 +181,26 @@ public class playerBehaviour : MonoBehaviour
                     // setNewSprite("walking1");
                     DebugState = "falling";
                     Falling();
-                    RecoverGrip(0.2f);
+                    RecoverGrip(IncreaseRate);
                     climbing = false;
                     break;
                 }
             case playerState.dead:
                 {
-
+                    SceneManager.LoadScene("Defeat");
                     break;
                 }
             // add faling movement same as wallking but no annimation
             default:
                 {
                     // setNewSprite("walking1");
-                    RecoverGrip(0.2f);
+                    RecoverGrip(IncreaseRate);
                     break;
                 }
         }
     }
 
-    
+
 
     void setNewSprite(string spriteName)
     {
@@ -240,8 +267,13 @@ public class playerBehaviour : MonoBehaviour
         //get monstor element
         // minus damge from monstors health 
         // set health(get health - player attack)
-    }
 
+        boss.setHeath(boss.getHeath() - damage);
+        boss.turnOffWeakSpot(weakSpotName);
+
+        canAttack = false;
+
+    }
 
     void Falling()
     {
@@ -278,6 +310,12 @@ public class playerBehaviour : MonoBehaviour
         {
             Grip += recoverRate * Time.deltaTime;
         }
+
+        //if(Grip >= 25)
+        //{
+        //    canClimb = true;
+        //    Debug.Log(gripAllow);
+        //}
     }
 
 
@@ -292,18 +330,15 @@ public class playerBehaviour : MonoBehaviour
         {
             collisionCount++;
         }
+        if (other.tag == "weakSpot")
+        {
+            weakSpotName = other.name;
+            canAttack = true;
+        }
 
     }
     void OnTriggerStay2D(Collider2D other)
     {
-        if (Input.GetButton("Fire2"))
-        {
-            if (other.tag == "weakSpot")
-            {
-                attackWeakSpot();
-            }
-
-        }
         if (other.tag == "monstor")
         {
             canClimb = true;
@@ -316,10 +351,6 @@ public class playerBehaviour : MonoBehaviour
                 state = playerState.Grounded;
             }
         }
-        //else
-        //{
-        //    canClimb = false;
-        //}
     }
     void OnTriggerExit2D(Collider2D other)
     {
@@ -335,6 +366,11 @@ public class playerBehaviour : MonoBehaviour
         if (other.tag == "monstor" && !canClimb)
         {
             state = playerState.falling;
+        }
+
+        if (other.tag == "weakSpot")
+        {
+            canAttack = false;
         }
 
     }
