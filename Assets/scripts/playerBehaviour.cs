@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,6 +31,7 @@ public class playerBehaviour : MonoBehaviour
     private float time = 0.0F;
     private float nextFire = 0.3F;
 
+
     // Use this for initialization
     void Start()
     {
@@ -50,8 +52,8 @@ public class playerBehaviour : MonoBehaviour
         Rbody = this.GetComponent<Rigidbody2D>();
         sprite = this.GetComponent<SpriteRenderer>();
 
-        health_bar.value = max_health;
-        
+
+
     }
 
     private void Update()
@@ -94,17 +96,24 @@ public class playerBehaviour : MonoBehaviour
         }
     }
 
+    private bool playerHasGrip()
+    {
+        if (Grip <= 0)
+        {
+            return false;
+        }
+        return true;
+    }
+
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-
+        grip_bar.value = Grip;
         switch (state)
         {
             case playerState.Grounded:
                 {
-                    setNewSprite("walking1");
+                    //setNewSprite("walking1");
                     Walking();
                     DebugState = "ground";
                     RecoverGrip(0.2f);
@@ -112,7 +121,6 @@ public class playerBehaviour : MonoBehaviour
                 }
             case playerState.climbing:
                 {
-
                     //if boss is shaking then grip will drain faster.
                     if (boss.state == BossBehaviour.boss_states.SHAKING)
                     {
@@ -123,8 +131,9 @@ public class playerBehaviour : MonoBehaviour
                             Climbing();
                             DecreaseGripOverTime(10.0f);
                         }
+                        //setNewSprite("climbing1");
                     }
-                    //setNewSprite("climbingSprite");
+
                     else if (playerHasGrip())
                     {
                         climbing = true;
@@ -142,7 +151,7 @@ public class playerBehaviour : MonoBehaviour
                 }
             case playerState.falling:
                 {
-                    setNewSprite("walking1");
+                    // setNewSprite("walking1");
                     DebugState = "falling";
                     Falling();
                     RecoverGrip(0.2f);
@@ -151,75 +160,20 @@ public class playerBehaviour : MonoBehaviour
                 }
             case playerState.dead:
                 {
-                    //minus one from lives
-                    Lives--;
-                    //calls scene manger to :
-                    // resets scene
-                    //resets timer 
-                    /*pass scene manger copy of players current state to reintate class
-                    and to check if the player is put of lives */
+
                     break;
                 }
             // add faling movement same as wallking but no annimation
             default:
                 {
-                    setNewSprite("walking1");
+                    // setNewSprite("walking1");
                     RecoverGrip(0.2f);
                     break;
                 }
         }
-        DebugState = "climbing";
-        Climbing();
-        DecreaseGripOverTime(10.0f);
-        grip_bar.value = Grip;
-        /* switch (state)
-         {
-             case playerState.Grounded:
-                 {
-                     setNewSprite("walkingSprite");
-                     Walking();
-                     DebugState = "ground";
-                     RecoverGrip(0.2f);
-                     break;
-                 }
-             case playerState.climbing:
-                 {
-                     //setNewSprite("climbingSprite");
-                     if (playerHasGrip())
-                     {
-                         DebugState = "climbing";
-                         Climbing();
-                         DecreaseGripOverTime(0.2f);
-                     }
-                     else
-                     {
-                         state = playerState.falling;
-                     }
-                     break;
-                 }
-             case playerState.falling:
-                 {
-                     setNewSprite("walkingSprite");
-                     DebugState = "falling";
-                     Falling();
-                     RecoverGrip(0.2f);
-                     climbing = false;
-                     break;
-                 }
-             case playerState.dead:
-                 {
-
-                     break;
-                 }
-             // add faling movement same as wallking but no annimation
-             default:
-                 {
-                     setNewSprite("walkingSprite");
-                     RecoverGrip(0.2f);
-                     break;
-                 }
-    }*/
     }
+
+    
 
     void setNewSprite(string spriteName)
     {
@@ -326,16 +280,9 @@ public class playerBehaviour : MonoBehaviour
         }
     }
 
-    bool playerHasGrip()
-    {
-        if (Grip <= 0)
-        {
-            return false;
-        }
-        return true;
-    }
 
-    private void OnTriggerEnter2D(Collider2D other)
+
+    void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "ground")
         {
@@ -347,7 +294,7 @@ public class playerBehaviour : MonoBehaviour
         }
 
     }
-    private void OnTriggerStay2D(Collider2D other)
+    void OnTriggerStay2D(Collider2D other)
     {
         if (Input.GetButton("Fire2"))
         {
@@ -374,7 +321,7 @@ public class playerBehaviour : MonoBehaviour
         //    canClimb = false;
         //}
     }
-    private void OnTriggerExit2D(Collider2D other)
+    void OnTriggerExit2D(Collider2D other)
     {
         if (other.tag == "monstor")
         {
@@ -392,7 +339,7 @@ public class playerBehaviour : MonoBehaviour
 
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "arm")
         {
@@ -400,3 +347,4 @@ public class playerBehaviour : MonoBehaviour
         }
     }
 }
+
