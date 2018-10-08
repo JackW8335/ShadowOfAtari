@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 enum playerState { idle, falling, Grounded, climbing, overhangClimbing, dead };
 
@@ -11,6 +12,10 @@ public class playerBehaviour : MonoBehaviour
     public string DebugState;
     public bool FacingRight;
     public bool climbing = false;
+    public int health;
+
+    public Slider health_bar;
+    public Slider grip_bar;
 
     public bool canClimb = false;
     private int collisionCount = 0;
@@ -28,6 +33,10 @@ public class playerBehaviour : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        health = 100;
+        health_bar.value = health;
+        grip_bar.value = Grip;
+
         walkingSpeed = 3.0f;
         climbingSpeed = 2.0f;
         fallForce = 0.5f;
@@ -44,7 +53,10 @@ public class playerBehaviour : MonoBehaviour
 
     private void Update()
     {
-       time = time + Time.deltaTime;
+        time = time + Time.deltaTime;
+
+        health_bar.value = health;
+        grip_bar.value = Grip;
 
         //if player action button
         if (canClimb)
@@ -82,7 +94,7 @@ public class playerBehaviour : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        
+
         switch (state)
         {
             case playerState.Grounded:
@@ -95,13 +107,13 @@ public class playerBehaviour : MonoBehaviour
                 }
             case playerState.climbing:
                 {
-                    
+
                     //if boss is shaking then grip will drain faster.
                     if (boss.state == BossBehaviour.boss_states.SHAKING)
                     {
                         if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
                         {
-                            
+
                             DebugState = "climbing";
                             Climbing();
                             DecreaseGripOverTime(10.0f);
@@ -191,8 +203,8 @@ public class playerBehaviour : MonoBehaviour
     void Climbing()
     {
         Rbody.gravityScale = 0;
-        Rbody.velocity = new Vector2(0,0);
-     
+        Rbody.velocity = new Vector2(0, 0);
+
         Vector3 climb = Vector3.zero;
         climb = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
         this.transform.position += climb * climbingSpeed * Time.deltaTime;
@@ -240,7 +252,14 @@ public class playerBehaviour : MonoBehaviour
 
     void DecreaseGripOverTime(float gripLossRate)
     {
-        Grip -= gripLossRate * Time.deltaTime;
+        if (Grip <= 0)
+        {
+            Grip = 0;
+        }
+        else
+        {
+            Grip -= gripLossRate * Time.deltaTime;
+        }
     }
 
     void RecoverGrip(float recoverRate)
@@ -266,15 +285,15 @@ public class playerBehaviour : MonoBehaviour
         {
             state = playerState.Grounded;
         }
-        if(other.tag == "monstor")
+        if (other.tag == "monstor")
         {
             collisionCount++;
         }
-       
+
     }
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (Input.GetButton("Fire2")) 
+        if (Input.GetButton("Fire2"))
         {
             if (other.tag == "weakSpot")
             {
@@ -285,11 +304,11 @@ public class playerBehaviour : MonoBehaviour
         if (other.tag == "monstor")
         {
             canClimb = true;
-          
+
         }
-        if(other.tag == "ground")
+        if (other.tag == "ground")
         {
-            if(!climbing)
+            if (!climbing)
             {
                 state = playerState.Grounded;
             }
@@ -305,10 +324,10 @@ public class playerBehaviour : MonoBehaviour
         {
             collisionCount--;
         }
-        if (collisionCount== 0)
+        if (collisionCount == 0)
         {
-                canClimb = false;
- 
+            canClimb = false;
+
         }
         if (other.tag == "monstor" && !canClimb)
         {
@@ -319,7 +338,7 @@ public class playerBehaviour : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "arm")
+        if (collision.gameObject.tag == "arm")
         {
             state = playerState.falling;
         }
