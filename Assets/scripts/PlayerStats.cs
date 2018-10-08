@@ -13,12 +13,14 @@ public class PlayerStats : MonoBehaviour
     public Slider health_bar;
     public Slider stamina_bar;
 
+    public bool grounded;
+
     // Use this for initialization
     void Start()
     {
         health_bar.value = max_health;
         stamina_bar.value = stamina;
-
+        grounded = true;
     }
 
     // Update is called once per frame
@@ -40,5 +42,14 @@ public class PlayerStats : MonoBehaviour
     void DealDamage(int damage)
     {
         health -= damage;
+    }
+
+    void OnCollisionEnter(Collision col)
+    {
+        if(col.gameObject.name == "Ground")
+        {
+            grounded = true;
+        }
+        //If touching climb spot and pressing key, !grounded
     }
 }

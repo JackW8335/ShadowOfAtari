@@ -9,6 +9,7 @@ public class DifficultyAndEnvironment : MonoBehaviour
     public Camera cam;
     public Renderer[] rend;
     public Material[] mats;
+   
     // Use this for initialization
     void Start()
     {
@@ -29,7 +30,7 @@ public class DifficultyAndEnvironment : MonoBehaviour
         {
             shaking(1.0f, 0.4f);
         }
-
+        
 
     }
 
@@ -61,10 +62,10 @@ public class DifficultyAndEnvironment : MonoBehaviour
 
         Vector3 originalPos = transform.localPosition;
 
-            float x = Random.Range(-1.0f, 1.0f) * magnitude;
-            float y = Random.Range(-1.0f, 1.0f) * magnitude;
+        float x = Random.Range(-0.2f, 0.2f) * magnitude;
+            //float y = Random.Range(-1.0f, 1.0f) * magnitude;
 
-            transform.localPosition = new Vector3(x, y, originalPos.z);
+            transform.localPosition = new Vector3(x, originalPos.y, originalPos.z);
         
     }
 }

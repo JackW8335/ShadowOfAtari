@@ -14,7 +14,7 @@ public class AttackActivation : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "player" && !doOnce)
+        if(collision.tag == "Player" && !doOnce)
         {
             if(!bossAttack.GetComponent<BossAttack>().enabled)
             {
