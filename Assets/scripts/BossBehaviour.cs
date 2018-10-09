@@ -18,8 +18,11 @@ public class BossBehaviour : MonoBehaviour
 
     public boss_states state;
 
+    private AudioSource hurtNoise;
+
     void Start()
     {
+        hurtNoise = this.GetComponent<AudioSource>();
         health = max_health;
         health_bar.value = health;
         state = boss_states.NORMAL;
@@ -68,6 +71,7 @@ public class BossBehaviour : MonoBehaviour
 
     public void turnOffWeakSpot(string weakspotName)
     {
+        hurtNoise.Play();
         GameObject weakSpot = GameObject.Find(weakspotName);
         weakSpot.SetActive(false);
     }
