@@ -23,7 +23,6 @@ public class playerBehaviour : MonoBehaviour
     public Slider grip_bar;
 
     public bool canClimb = false;
-    private bool gripAllow = true;
     private int collisionCount = 0;
 
     playerState state;
@@ -185,7 +184,7 @@ public class playerBehaviour : MonoBehaviour
                     anim.SetBool("Climbing", false);
                     DebugState = "falling";
                     Falling();
-                    RecoverGrip(IncreaseRate);
+                    //RecoverGrip(IncreaseRate);
                     climbing = false;
                     break;
                 }

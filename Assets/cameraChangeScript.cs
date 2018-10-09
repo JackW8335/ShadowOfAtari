@@ -9,17 +9,19 @@ public class cameraChangeScript : MonoBehaviour {
     private Camera oldCameraSave;
     private Camera newCameraSave;
     public GameObject player;
-    private bool enterFromLeft;
-    private bool enterFromAbove;
+ 
 
     private void Start()
     {
         newCamera.enabled = false;  //disable all but start camera at beginning
-        enterFromLeft = false;
+        //enterFromLeft = false;
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
+
+        positionBasedOnCamera(other);
+
         if (other.tag == "Player")
         {
             oldCameraSave = oldCamera;  //save which cameras were old and new
@@ -27,8 +29,6 @@ public class cameraChangeScript : MonoBehaviour {
             newCamera.enabled = true;   //disable old camera and enable new
             oldCamera.enabled = false;
         }
-
-        positionBasedOnCamera(other);
         //Debug.Log(enterFromLeft + " " + this.gameObject.name.ToString());
     }
     void OnTriggerExit2D(Collider2D other)
@@ -37,8 +37,6 @@ public class cameraChangeScript : MonoBehaviour {
         {
             oldCamera = newCameraSave;  //swap active cameras using old saves
             newCamera = oldCameraSave;
-
-
         }
     }
 
@@ -49,8 +47,8 @@ public class cameraChangeScript : MonoBehaviour {
         {
             case "First_Camera_Trigger":
                 {
-                    directionEnter(other);
-                    if (enterFromLeft)
+                    //directionEnter(other);
+                    if (enterFromLeft(other))
                     {
                         player.transform.position = new Vector3(this.gameObject.transform.position.x, player.transform.position.y);
                         player.transform.position += new Vector3(1, 0);
@@ -64,23 +62,23 @@ public class cameraChangeScript : MonoBehaviour {
                 }
             case "Second_Camera_Trigger":
                 {
-                    directionEnter(other);
-                    if (enterFromAbove)
+                    if (enterFromAbove(other))
                     {
                         player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
-                        player.transform.position += new Vector3(0, -1);
+                        player.transform.position -= new Vector3(0, 2);
                     }
                     else
                     {
                         player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
-                        player.transform.position += new Vector3(0, 1);
+                        player.transform.position += new Vector3(0, 2);
                     }
+                    //directionEnter(other);
                     break;
                 }
             case "Third_Camera_Trigger":
                 {
-                    directionEnter(other);
-                    if (enterFromAbove)
+                    //directionEnter(other);
+                    if (enterFromAbove(other))
                     {
                         player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
                         player.transform.position += new Vector3(0, -1);
@@ -99,24 +97,38 @@ public class cameraChangeScript : MonoBehaviour {
         }
     }
 
-    void directionEnter(Collider2D other)
+    bool enterFromAbove(Collider2D other)
     {
-        if (other.transform.position.x < this.transform.position.x)
-        {
-            enterFromLeft = true;
-        }
-        else if (other.transform.position.x > this.transform.position.x)
-        {
-            enterFromLeft = false;
-        }
-
         if (other.transform.position.y < this.transform.position.y)
         {
-            enterFromAbove = false;
+            //enterFromAbove = false;
+            Debug.Log("below");
+            return false;
         }
         else if (other.transform.position.y > this.transform.position.y)
         {
-            enterFromAbove = true;
+            //enterFromAbove = true;
+            Debug.Log("above");
+            return true;
         }
+
+        Debug.Log("Test");
+
+        return true;
+    }
+
+    bool enterFromLeft(Collider2D other)
+    {
+        if (other.transform.position.x < this.transform.position.x)
+        {
+            //enterFromLeft = true;
+            return true;
+        }
+        else if (other.transform.position.x > this.transform.position.x)
+        {
+            //enterFromLeft = false;
+            return false;
+        }
+        return true;
     }
 }
