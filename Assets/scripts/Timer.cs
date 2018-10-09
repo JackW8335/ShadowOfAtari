@@ -16,7 +16,8 @@ public class Timer : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        time = Time.time;
+        time = 0;
+   
         score = this.GetComponent<Text>();
 
 
