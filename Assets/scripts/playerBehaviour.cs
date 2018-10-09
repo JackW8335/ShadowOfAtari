@@ -19,6 +19,7 @@ public class playerBehaviour : MonoBehaviour
     public float IncreaseRate;
 
     public Slider health_bar;
+    public Slider max_health_bar;
     public Slider grip_bar;
 
     public bool canClimb = false;
@@ -45,6 +46,7 @@ public class playerBehaviour : MonoBehaviour
     void Start()
     {
         health = 100;
+        max_health_bar.value = health;
         health_bar.value = health;
         grip_bar.value = Grip;
 
@@ -399,6 +401,7 @@ public class playerBehaviour : MonoBehaviour
         if (collision.gameObject.tag == "arm")
         {
             state = playerState.falling;
+            health -= 25;
         }
     }
 }
