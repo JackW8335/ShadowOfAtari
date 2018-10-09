@@ -269,10 +269,11 @@ public class playerBehaviour : MonoBehaviour
             if ((h != 0) || (v != 0))
             {
                 anim.SetBool("Climbing", true);
+                anim.SetBool("Climb_Idle", false);
             }
             else
             {
-                anim.SetBool("Climbing", true);
+                anim.SetBool("Climb_Idle", true);
             }
         }
         
