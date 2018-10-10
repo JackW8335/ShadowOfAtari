@@ -150,7 +150,7 @@ public class playerBehaviour : MonoBehaviour
                         {
                             if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
                             {
-                                DecreaseGripOverTime(10.0f);
+                                DecreaseGripOverTime(15.0f);
                             }
                             //setNewSprite("climbing1");
                         }
@@ -185,7 +185,7 @@ public class playerBehaviour : MonoBehaviour
                     anim.SetBool("Climbing", false);
                     DebugState = "falling";
                     Falling();
-                    RecoverGrip(IncreaseRate);
+                    //RecoverGrip(IncreaseRate);
                     climbing = false;
                     break;
                 }
