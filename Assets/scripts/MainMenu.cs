@@ -4,7 +4,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour {
-
+    public void Start()
+    {
+        Screen.SetResolution(192, 160, true);
+    }
 	public void PlayGame()
     {
         PlayerPrefs.SetFloat("Highscore1", 0);
