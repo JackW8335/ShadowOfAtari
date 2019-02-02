@@ -41,6 +41,8 @@ public class playerBehaviour : MonoBehaviour
     private float time = 0.0F;
     private float nextFire = 0.3F;
 
+    public Vector2 vel;
+
 
     // Use this for initialization
     void Start()
@@ -72,6 +74,7 @@ public class playerBehaviour : MonoBehaviour
 
     private void Update()
     {
+        vel = Rbody.velocity;
         time = time + Time.deltaTime;
 
         health_bar.value = health;
@@ -261,6 +264,7 @@ public class playerBehaviour : MonoBehaviour
         climb = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0);
         this.transform.position += climb * climbingSpeed * Time.deltaTime;
 
+
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
@@ -282,14 +286,6 @@ public class playerBehaviour : MonoBehaviour
 
     void attackWeakSpot()
     {
-        //get object refrence
-        // deal damage 
-        // tell boss to trun off weak spot effect 
-
-        //get monstor element
-        // minus damge from monstors health 
-        // set health(get health - player attack)
-
         boss.setHeath(boss.getHeath() - damage);
         boss.turnOffWeakSpot(weakSpotName);
 
