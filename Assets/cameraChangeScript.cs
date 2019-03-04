@@ -50,7 +50,7 @@ public class cameraChangeScript : MonoBehaviour {
             case "First_Camera_Trigger":
                 {
                     directionEnter(other);
-                    if (enterFromLeft)
+                    if (enterFromLeft)  //moves the player past the trigger area based on direction of entering
                     {
                         player.transform.position = new Vector3(this.gameObject.transform.position.x, player.transform.position.y);
                         player.transform.position += new Vector3(1, 0);
@@ -101,9 +101,9 @@ public class cameraChangeScript : MonoBehaviour {
 
     void directionEnter(Collider2D other)
     {
-        if (other.transform.position.x < this.transform.position.x)
+        if (other.transform.position.x < this.transform.position.x)     //reminder - look at GamePlayProgramming project - used certain method for checking direction of entering trigger
         {
-            enterFromLeft = true;
+            enterFromLeft = true;   //these bool values are used for pushing the character past the trigger area
         }
         else if (other.transform.position.x > this.transform.position.x)
         {
