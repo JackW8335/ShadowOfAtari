@@ -18,10 +18,37 @@ public class cameraChangeScript : MonoBehaviour {
         enterFromLeft = false;
     }
 
+    void Update()
+    {
+        //Try camera system working this way so the update keeps it in the right position, remove the teleportation etc
+        //switch (player.GetComponent<playerBehaviour>().playerPosition)
+        //{
+        //    case PlayerPosition.START:
+                
+        //        break;
+        //    case PlayerPosition.BOTTOM_CAMERA:
+        //        newCamera = GameObject.Find("Camera_1").GetComponent<Camera>();
+        //        newCamera.enabled = true;
+        //        oldCamera.enabled = false;
+        //        break;
+        //    case PlayerPosition.MIDDLE_CAMERA:
+        //        newCamera = GameObject.Find("Camera_2").GetComponent<Camera>();
+        //        newCamera.enabled = true;
+        //        oldCamera.enabled = false;
+        //        break;
+        //    case PlayerPosition.TOP_CAMERA:
+        //        newCamera = GameObject.Find("Camera_3").GetComponent<Camera>();
+        //        newCamera.enabled = true;
+        //        oldCamera.enabled = false;
+        //        break;
+        //}
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Player")
         {
+            Debug.Log("Enter");
             oldCameraSave = oldCamera;  //save which cameras were old and new
             newCameraSave = newCamera;
             newCamera.enabled = true;   //disable old camera and enable new
@@ -35,6 +62,7 @@ public class cameraChangeScript : MonoBehaviour {
     {
         if (other.tag == "Player")
         {
+            Debug.Log("Leaving");
             oldCamera = newCameraSave;  //swap active cameras using old saves
             newCamera = oldCameraSave;
 
@@ -68,12 +96,13 @@ public class cameraChangeScript : MonoBehaviour {
                     if (enterFromAbove)
                     {
                         player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
-                        player.transform.position += new Vector3(0, -1);
+                        player.transform.position += new Vector3(0, -2);
+                        enterFromAbove = false;
                     }
                     else
                     {
                         player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
-                        player.transform.position += new Vector3(0, 1);
+                        player.transform.position += new Vector3(0, 2);
                     }
                     break;
                 }
@@ -83,12 +112,12 @@ public class cameraChangeScript : MonoBehaviour {
                     if (enterFromAbove)
                     {
                         player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
-                        player.transform.position += new Vector3(0, -1);
+                        player.transform.position += new Vector3(0, -2);
                     }
                     else
                     {
                         player.transform.position = new Vector3(player.transform.position.x, this.gameObject.transform.position.y);
-                        player.transform.position += new Vector3(0, 1);
+                        player.transform.position += new Vector3(0, 2);
                     }
                     break;
                 }

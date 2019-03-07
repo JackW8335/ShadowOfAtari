@@ -19,7 +19,7 @@ public class showWeakSpot : MonoBehaviour {
     {
         checkingDistances();
         showSpots();
-        Debug.Log(distance);
+        //Debug.Log(distance);
 
     }
 

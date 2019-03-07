@@ -7,8 +7,28 @@ using UnityEngine.SceneManagement;
 
 enum playerState { idle, falling, Grounded, climbing, overhangClimbing, dead };
 
+public enum PlayerPosition
+{
+    START,
+    BOTTOM_CAMERA,
+    MIDDLE_CAMERA,
+    TOP_CAMERA
+}
+
+
 public class playerBehaviour : MonoBehaviour
 {
+    [SerializeField]
+    private GameObject firstTrigger;
+    [SerializeField]
+    private GameObject secondTrigger;
+    [SerializeField]
+    private GameObject thirdTrigger;
+    Vector3 firstTriggerPosition;
+    Vector3 secondTriggerPosition;
+    Vector3 thirdTriggerPosition;
+
+    public PlayerPosition playerPosition;
     public float walkingSpeed, climbingSpeed, fallForce;
     public string DebugState;
     public bool FacingRight;
@@ -45,6 +65,12 @@ public class playerBehaviour : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        firstTriggerPosition = firstTrigger.transform.position;
+        secondTriggerPosition = secondTrigger.transform.position;
+        thirdTriggerPosition = thirdTrigger.transform.position;
+        playerPosition = PlayerPosition.START;
+
+
         health = 100;
         max_health_bar.value = health;
         health_bar.value = health;
@@ -72,6 +98,23 @@ public class playerBehaviour : MonoBehaviour
 
     private void Update()
     {
+        if (transform.position.x < firstTriggerPosition.x)
+        {
+            playerPosition = PlayerPosition.START;
+        }
+        else if ((transform.position.x > firstTriggerPosition.x) & (transform.position.y < secondTriggerPosition.y))
+        {
+            playerPosition = PlayerPosition.BOTTOM_CAMERA;
+        }
+        else if ((transform.position.x > firstTriggerPosition.x) & (transform.position.y > secondTriggerPosition.y) & (transform.position.y < thirdTriggerPosition.y))
+        {
+            playerPosition = PlayerPosition.MIDDLE_CAMERA;
+        }
+        else if ((transform.position.x > firstTriggerPosition.x) & (transform.position.y > secondTriggerPosition.y) & (transform.position.y > thirdTriggerPosition.y))
+        {
+            playerPosition = PlayerPosition.TOP_CAMERA;
+        }
+
         time = time + Time.deltaTime;
 
         health_bar.value = health;
