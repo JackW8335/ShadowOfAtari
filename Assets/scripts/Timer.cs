@@ -29,7 +29,7 @@ public class Timer : MonoBehaviour
     void Update()
     {
         time += Time.deltaTime;
-        score.text = time.ToString("F1");
+        score.text = time.ToString("F0");
 
         if (boss.health <= 0)
         {

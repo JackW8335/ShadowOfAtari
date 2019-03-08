@@ -1,34 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 enum playerState { idle, falling, Grounded, climbing, overhangClimbing, dead };
 
-public enum PlayerPosition
-{
-    START,
-    BOTTOM_CAMERA,
-    MIDDLE_CAMERA,
-    TOP_CAMERA
-}
-
-
 public class playerBehaviour : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject firstTrigger;
-    [SerializeField]
-    private GameObject secondTrigger;
-    [SerializeField]
-    private GameObject thirdTrigger;
-    Vector3 firstTriggerPosition;
-    Vector3 secondTriggerPosition;
-    Vector3 thirdTriggerPosition;
-
-    public PlayerPosition playerPosition;
     public float walkingSpeed, climbingSpeed, fallForce;
     public string DebugState;
     public bool FacingRight;
@@ -37,10 +14,6 @@ public class playerBehaviour : MonoBehaviour
 
     public float DecreaseRate;
     public float IncreaseRate;
-
-    public Slider health_bar;
-    public Slider max_health_bar;
-    public Slider grip_bar;
 
     public bool canClimb = false;
     private bool gripAllow = true;
@@ -65,16 +38,7 @@ public class playerBehaviour : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        firstTriggerPosition = firstTrigger.transform.position;
-        secondTriggerPosition = secondTrigger.transform.position;
-        thirdTriggerPosition = thirdTrigger.transform.position;
-        playerPosition = PlayerPosition.START;
-
-
         health = 100;
-        max_health_bar.value = health;
-        health_bar.value = health;
-        grip_bar.value = Grip;
 
         walkingSpeed = 3.0f;
         climbingSpeed = 2.0f;
@@ -98,27 +62,8 @@ public class playerBehaviour : MonoBehaviour
 
     private void Update()
     {
-        if (transform.position.x < firstTriggerPosition.x)
-        {
-            playerPosition = PlayerPosition.START;
-        }
-        else if ((transform.position.x > firstTriggerPosition.x) & (transform.position.y < secondTriggerPosition.y))
-        {
-            playerPosition = PlayerPosition.BOTTOM_CAMERA;
-        }
-        else if ((transform.position.x > firstTriggerPosition.x) & (transform.position.y > secondTriggerPosition.y) & (transform.position.y < thirdTriggerPosition.y))
-        {
-            playerPosition = PlayerPosition.MIDDLE_CAMERA;
-        }
-        else if ((transform.position.x > firstTriggerPosition.x) & (transform.position.y > secondTriggerPosition.y) & (transform.position.y > thirdTriggerPosition.y))
-        {
-            playerPosition = PlayerPosition.TOP_CAMERA;
-        }
 
         time = time + Time.deltaTime;
-
-        health_bar.value = health;
-        grip_bar.value = Grip;
 
         if (health <= 0.0f)
         {
@@ -139,12 +84,13 @@ public class playerBehaviour : MonoBehaviour
                             state = playerState.falling;
 
                             Debug.Log("Falling state");
+                            anim.SetBool("Climbing", false);
                             break;
 
                         case false:
 
                             state = playerState.climbing;
-
+                            anim.SetBool("Climbing", true);
                             Debug.Log("climbingState");
                             break;
 
@@ -172,12 +118,12 @@ public class playerBehaviour : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        grip_bar.value = Grip;
         switch (state)
         {
             case playerState.Grounded:
                 {
                     //setNewSprite("walking1");
+                    anim.SetBool("Climbing", false);
                     Walking();
                     DebugState = "ground";
                     RecoverGrip(IncreaseRate);
@@ -390,6 +336,7 @@ public class playerBehaviour : MonoBehaviour
         if (other.tag == "ground")
         {
             state = playerState.Grounded;
+            anim.SetBool("Climbing", false);
         }
         if (other.tag == "monstor")
         {

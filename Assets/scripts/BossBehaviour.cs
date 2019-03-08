@@ -13,10 +13,11 @@ public class BossBehaviour : MonoBehaviour
     private float time;
     private float rand;
 
-    public Slider health_bar;
     public enum boss_states { SHAKING, NORMAL, DEAD };
 
     public boss_states state;
+
+    public string levelToLoad;
 
     private AudioSource hurtNoise;
 
@@ -24,7 +25,6 @@ public class BossBehaviour : MonoBehaviour
     {
         hurtNoise = this.GetComponent<AudioSource>();
         health = max_health;
-        health_bar.value = health;
         state = boss_states.NORMAL;
         time = 0.0f;
 
@@ -38,7 +38,7 @@ public class BossBehaviour : MonoBehaviour
         if(health <= 0.0f)
         {
             state = boss_states.DEAD;
-            SceneManager.LoadScene("Victory");
+            SceneManager.LoadScene(levelToLoad);
               
         }
         time += Time.deltaTime;
@@ -66,7 +66,6 @@ public class BossBehaviour : MonoBehaviour
     public void setHeath(float nwHealth)
     {
         health = nwHealth;
-        health_bar.value = health;
     }
 
     public void turnOffWeakSpot(string weakspotName)
