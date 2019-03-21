@@ -4,28 +4,36 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+public enum BOSS_STATES
+{
+    SHAKING,
+    NORMAL,
+    SWOOPING,
+    DEAD
+};
+
 public class BossBehaviour : MonoBehaviour
 {
 
     // Use this for initialization
-    private float max_health = 100;
+    protected float max_health = 100;
     public float health;
-    private float time;
-    private float rand;
+    protected float time;
+    protected float rand;
 
-    public enum boss_states { SHAKING, NORMAL, DEAD };
 
-    public boss_states state;
+
+    public BOSS_STATES state;
 
     public string levelToLoad;
 
     private AudioSource hurtNoise;
 
-    void Start()
+    protected virtual void Start()
     {
         hurtNoise = this.GetComponent<AudioSource>();
         health = max_health;
-        state = boss_states.NORMAL;
+        state = BOSS_STATES.NORMAL;
         time = 0.0f;
 
          rand = Random.Range(5.0f,10.0f);
@@ -33,11 +41,11 @@ public class BossBehaviour : MonoBehaviour
 }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         if(health <= 0.0f)
         {
-            state = boss_states.DEAD;
+            state = BOSS_STATES.DEAD;
             SceneManager.LoadScene(levelToLoad);
               
         }
@@ -46,12 +54,12 @@ public class BossBehaviour : MonoBehaviour
         if (time >= rand)
         {
             
-            state = boss_states.SHAKING;
+            state = BOSS_STATES.SHAKING;
         }
         if (time >= rand + 5)
         {
 
-            state = boss_states.NORMAL;
+            state = BOSS_STATES.NORMAL;
             time = 0.0f;
             rand = Random.Range(5.0f, 10.0f);
         }

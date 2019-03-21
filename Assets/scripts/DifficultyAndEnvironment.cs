@@ -26,7 +26,7 @@ public class DifficultyAndEnvironment : MonoBehaviour
     {
         changeDifficulty();
 
-        if (boss.state == BossBehaviour.boss_states.SHAKING)
+        if (boss.state == BOSS_STATES.SHAKING)
         {
             shaking(1.0f, 0.4f);
         }

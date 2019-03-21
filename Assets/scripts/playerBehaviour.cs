@@ -135,7 +135,7 @@ public class playerBehaviour : MonoBehaviour
 
                     if (playerHasGrip())
                     {
-                        if (boss.state == BossBehaviour.boss_states.SHAKING)
+                        if (boss.state == BOSS_STATES.SHAKING)
                         {
                             if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
                             {
