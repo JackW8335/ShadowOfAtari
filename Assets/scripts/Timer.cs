@@ -13,16 +13,19 @@ public class Timer : MonoBehaviour
 
     public BossBehaviour boss;
 
+    private SaveTimer savedTime;
+
     // Use this for initialization
     void Start()
     {
-        time = 0;
+        savedTime = GameObject.FindGameObjectWithTag("TimerSave").GetComponent<SaveTimer>();
+        time = savedTime.savedTime;
    
         score = this.GetComponent<Text>();
 
 
         score.text = time.ToString();
-
+        
     }
 
     // Update is called once per frame
@@ -31,7 +34,7 @@ public class Timer : MonoBehaviour
         time += Time.deltaTime;
         score.text = time.ToString("F0");
 
-        if (boss.health <= 0)
+        if (boss.health <= 0 && boss.GetComponent<FlyingBoss>())
         {
             SetScore();
         }
