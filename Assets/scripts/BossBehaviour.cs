@@ -27,11 +27,11 @@ public class BossBehaviour : MonoBehaviour
 
     public string levelToLoad;
 
-    private AudioSource hurtNoise;
+    protected AudioSource hurtNoise;
 
     protected virtual void Start()
     {
-        hurtNoise = this.GetComponent<AudioSource>();
+        hurtNoise = GetComponentInParent<AudioSource>();
         health = max_health;
         state = BOSS_STATES.NORMAL;
         time = 0.0f;

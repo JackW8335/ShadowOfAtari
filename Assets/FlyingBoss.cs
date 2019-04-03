@@ -13,7 +13,7 @@ public class FlyingBoss : BossBehaviour
     private float lerpSpeed = 0.3f;
     private float swoopTime = 0f;
 
-    private Animator[] wingAnims;
+   
 
     bool swoopDown = true;
     bool playerOnBoard = false;
@@ -24,12 +24,8 @@ public class FlyingBoss : BossBehaviour
         base.Start();
         startingPos = transform.position;
         swoopPos = new Vector3(startingPos.x, startingPos.y - 15, startingPos.z);
-        wingAnims = new Animator[2];
+        hurtNoise = GetComponent<AudioSource>();
 
-        for(int i = 0; i < 2; i++)
-        {
-            wingAnims[i] = transform.GetChild(i).GetComponent<Animator>();
-        }
     }
 	
 	// Update is called once per frame
@@ -63,11 +59,7 @@ public class FlyingBoss : BossBehaviour
     {
         if(swoopDown)
         {
-            for(int i = 0; i < 2; i++)
-            {
-                wingAnims[i].SetTrigger("LowerWing");
-            }
-
+           
             transform.position = Vector3.Lerp(transform.position, swoopPos, lerpSpeed * Time.deltaTime);
             if (transform.position.y <= (swoopPos.y + 5))
             {
@@ -76,10 +68,7 @@ public class FlyingBoss : BossBehaviour
         }
         else
         {
-            for (int i = 0; i < 2; i++)
-            {
-                wingAnims[i].SetTrigger("WingUp");
-            }
+            
             transform.position = Vector3.Lerp(transform.position, startingPos, lerpSpeed * Time.deltaTime);
             if(transform.position.y >= (startingPos.y - 2 ))
             {

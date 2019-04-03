@@ -132,7 +132,7 @@ public class playerBehaviour : MonoBehaviour
             case playerState.climbing:
                 {
                     //if boss is shaking then grip will drain faster.
-
+                    transform.parent = boss.transform;
                     if (playerHasGrip())
                     {
                         if (boss.state == BOSS_STATES.SHAKING)
@@ -164,6 +164,7 @@ public class playerBehaviour : MonoBehaviour
                     else
                     {
                         state = playerState.falling;
+                        transform.parent = null;
                         climbing = false;
                     }
                     break;
