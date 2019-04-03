@@ -334,7 +334,7 @@ public class playerBehaviour : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "ground")
+        if (other.tag == "ground" && !climbing)
         {
             state = playerState.Grounded;
             anim.SetBool("Climbing", false);
